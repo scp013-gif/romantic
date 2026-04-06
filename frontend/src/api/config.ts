@@ -3,7 +3,6 @@ import { useAuthStore } from "@/store/useAuthStore";
 
 const client = axios.create({
     baseURL:'http://localhost:3000/api',
-    timeout:10000
 });
 
 let isRefreshing = false;

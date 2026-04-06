@@ -1,21 +1,52 @@
-import { Controller, Post, UseGuards, Body, Sse, Req, Delete, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, UseGuards, Body, Sse, Req, Delete, Param, ParseIntPipe, Res } from '@nestjs/common';
 import { UserUploadDto } from './dto/user.upload';
 import { GenerationService } from './generation.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Observable } from 'rxjs';
 
 @Controller('generation')
 @UseGuards(AuthGuard('jwt'))
 export class GenerationController {
   constructor(private readonly generationService: GenerationService) {}
 
-  @Sse('upload')
   @Post('upload')
-  async upload(@Body() userUploadDto: UserUploadDto):Promise<Observable<MessageEvent>> {
-    try{
-      return await this.generationService.callCozeApi(userUploadDto);
-    }catch(err){
-      throw err;
+  async upload(
+    @Body() userUploadDto: UserUploadDto, 
+    @Res() res: Response // 注入响应对象
+  ) {
+    // 1. 手动设置 SSE 所需的响应头
+    (res as any).setHeader('Content-Type', 'text/event-stream');
+    (res as any).setHeader('Cache-Control', 'no-cache');
+    (res as any).setHeader('Connection', 'keep-alive');
+
+    try {
+      // 2. 获取 RxJS Observable 流
+      const observable = await this.generationService.callCozeApi(userUploadDto);
+
+      // 3. 订阅流并手动写入数据包
+      const subscription = observable.subscribe({
+        next: (event: any) => {
+          // 按照 SSE 格式写入：data: 内容\n\n
+          (res as any).write(`data: ${JSON.stringify(event.data)}\n\n`);
+        },
+        error: (err) => {
+          console.error('流处理出错:', err);
+          (res as any).end();
+        },
+        complete: () => {
+          // 发送结束标识并关闭连接
+          (res as any).write('data: "[DONE]"\n\n');
+          (res as any).end();
+        }
+      });
+
+      // 4. 当客户端主动断开连接时，取消订阅防止内存泄漏
+      (res as any).on('close', () => {
+        subscription.unsubscribe();
+      });
+
+    } catch (err) {
+      console.error('开启流失败:', err);
+      (res as any).status(500).send('Internal Server Error');
     }
   }
 

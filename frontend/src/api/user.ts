@@ -7,3 +7,4 @@ export const doLogin = async (credential:Credential) => {
 export const doRegister = async (credential:Credential) => {
     return client.post('/auth/register',credential);
 }
+
