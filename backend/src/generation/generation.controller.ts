@@ -5,7 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 
 @Controller('generation')
-
+@UseGuards(AuthGuard('jwt'))
 export class GenerationController {
   constructor(private readonly generationService: GenerationService) {}
 
