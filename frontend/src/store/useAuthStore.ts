@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { User } from "@/types/user";
+import type { User } from "@/types/User";
 import { doLogin, doRegister } from "@/api/user";
 import type { Credential } from "@/types/Credential";
 

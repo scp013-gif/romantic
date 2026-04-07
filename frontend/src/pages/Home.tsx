@@ -16,7 +16,7 @@ export default function Home() {
   const [blessing, setBlessing] = useState('');
   const [coupleImg, setCoupleImg] = useState('');
   const [status, setStatus] = useState<'idle' | 'uploading' | 'generating' | 'success'>('idle');
-  const isLocked = status === 'generating' || 'generating' ;
+  const isLocked = status === 'uploading' || status === 'generating';
 
   // 处理文件选择与本地预览
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'male' | 'female') => {
