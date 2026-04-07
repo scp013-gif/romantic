@@ -95,4 +95,29 @@ export class GenerationService {
             }
         });
     }
+
+    async getRecords(userId:number){
+        try{
+            return await this.prismaService.generationRecord.findMany({
+                where:{
+                    userId
+                },
+                select:{
+                    id:true,
+                    coupleImgUrl:true,
+                    blessing:true,
+                    createdAt:true,
+                    style:true,
+                    scene:true
+                },
+                orderBy:{
+                    createdAt:'desc'
+                }
+            })
+        }catch(err){
+            console.log(err);
+            return err;
+        }
+    }
+    
 }

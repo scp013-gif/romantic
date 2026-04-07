@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Body, Sse, Req, Delete, Param, ParseIntPipe, Res } from '@nestjs/common';
+import { Controller, Post, UseGuards, Body, Req, Delete, Param, ParseIntPipe, Res, Get } from '@nestjs/common';
 import { UserUploadDto } from './dto/user.upload';
 import { GenerationService } from './generation.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -11,18 +11,18 @@ export class GenerationController {
   @Post('upload')
   async upload(
     @Body() userUploadDto: UserUploadDto, 
-    @Res() res: Response // 注入响应对象
+    @Res() res: Response 
   ) {
-    // 1. 手动设置 SSE 所需的响应头
+    
     (res as any).setHeader('Content-Type', 'text/event-stream');
     (res as any).setHeader('Cache-Control', 'no-cache');
     (res as any).setHeader('Connection', 'keep-alive');
 
     try {
-      // 2. 获取 RxJS Observable 流
+      
       const observable = await this.generationService.callCozeApi(userUploadDto);
 
-      // 3. 订阅流并手动写入数据包
+      
       const subscription = observable.subscribe({
         next: (event: any) => {
           // 按照 SSE 格式写入：data: 内容\n\n
@@ -39,7 +39,7 @@ export class GenerationController {
         }
       });
 
-      // 4. 当客户端主动断开连接时，取消订阅防止内存泄漏
+      //  当客户端主动断开连接时，取消订阅防止内存泄漏
       (res as any).on('close', () => {
         subscription.unsubscribe();
       });
@@ -71,6 +71,18 @@ export class GenerationController {
     try{
       const userId = req.user.id;
       return this.generationService.deleteRecords(userId,id);
+    }catch(err){
+      throw err;
+    }
+  }
+
+  @Get('records')
+  async getRecords(
+    @Req() req:any,
+  ){
+    try{
+      const userId = req.user.id;
+      return this.generationService.getRecords(userId);
     }catch(err){
       throw err;
     }
