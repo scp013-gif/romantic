@@ -43,7 +43,7 @@ export default function Mine() {
     }
     useEffect(() => {
         getRecord();
-    },[])
+    },[]);
     return (
     <div className="min-h-screen p-6 lg:p-12 max-w-7xl mx-auto space-y-10 relative">
       {/* 个人信息头部 */}
@@ -124,69 +124,61 @@ export default function Mine() {
 
       {/* --- 沉浸式详情模态框 --- */}
       {selectedRecord && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 overflow-hidden">
-          {/* 背景磨砂遮罩 */}
-          <div 
-            className="absolute inset-0 bg-rose-950/40 backdrop-blur-xl animate-in fade-in duration-500" 
-            onClick={() => setSelectedRecord(null)} 
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 overflow-y-auto">
+      {/* 背景磨砂遮罩 */}
+      <div
+        className="absolute inset-0 bg-rose-950/40 backdrop-blur-xl animate-in fade-in duration-500"
+        onClick={() => setSelectedRecord(null)}
+      />
+
+      {/* 详情卡片容器 */}
+      <div className="relative bg-white w-full max-w-5xl max-h-[90vh] rounded-[3.5rem] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col md:flex-row animate-in zoom-in-95 slide-in-from-bottom-8 duration-500">
+        {/* 手机端关闭按钮 */}
+        <button
+          onClick={() => setSelectedRecord(null)}
+          className="absolute top-4 right-4 z-20 p-2 bg-white/90 backdrop-blur-md rounded-full text-pink-500 hover:bg-pink-500 hover:text-white transition-all shadow-xl border border-pink-50 md:top-6 md:right-6 md:p-3"
+        >
+          <X size={20} />
+        </button>
+
+        {/* 左侧：完整大图展示 */}
+        <div className="w-full md:w-3/5 h-64 md:h-auto relative group overflow-hidden bg-gray-100">
+          <img
+            src={selectedRecord.coupleImgUrl}
+            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
           />
-          
-          {/* 详情卡片容器 */}
-          <div className="relative bg-white w-full max-w-5xl rounded-[3.5rem] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col md:flex-row animate-in zoom-in-95 slide-in-from-bottom-8 duration-500">
-            {/* 手机端关闭按钮 */}
-            <button 
-              onClick={() => setSelectedRecord(null)}
-              className="absolute top-6 right-6 z-20 p-3 bg-white/90 backdrop-blur-md rounded-full text-pink-500 hover:bg-pink-500 hover:text-white transition-all shadow-xl border border-pink-50"
-            >
-              <X size={24} />
-            </button>
-
-            {/* 左侧：完整大图展示 */}
-            <div className="w-full md:w-3/5 h-[350px] md:h-[650px] relative group overflow-hidden">
-              <img src={selectedRecord.coupleImgUrl} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
-              {/* 图片上的标签 */}
-              <div className="absolute bottom-8 left-8 flex gap-3">
-                <span className="bg-white/90 backdrop-blur-md px-5 py-2.5 rounded-2xl text-pink-600 text-xs font-black shadow-2xl flex items-center gap-2 border border-pink-50">
-                  <Palette size={14} /> {selectedRecord.style}
-                </span>
-                <span className="bg-white/90 backdrop-blur-md px-5 py-2.5 rounded-2xl text-rose-600 text-xs font-black shadow-2xl flex items-center gap-2 border border-rose-50">
-                  <MapPin size={14} /> {selectedRecord.scene}
-                </span>
-              </div>
-            </div>
-
-            {/* 右侧：完整祝福语与信息 */}
-            <div className="w-full md:w-2/5 p-8 md:p-12 flex flex-col justify-center space-y-10 bg-gradient-to-br from-white via-white to-pink-50/50 relative">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-pink-400 font-black tracking-widest uppercase text-[10px]">
-                  <Sparkles size={14} /> 浪漫记录 · {new Date(selectedRecord.createdAt).toLocaleDateString()}
-                </div>
-                <h3 className="text-4xl font-black text-gray-800 leading-tight tracking-tighter">时光寄语</h3>
-              </div>
-
-              <div className="relative">
-                <MessageSquareHeart className="absolute -top-10 -left-10 text-pink-50/80" size={100} />
-                <p className="relative text-2xl text-gray-700 font-serif italic leading-relaxed whitespace-pre-wrap drop-shadow-sm">
-                  {selectedRecord.blessing}
-                </p>
-              </div>
-
-              <div className="pt-8 border-t border-pink-100 flex items-center justify-between">
-                <div className="flex -space-x-3">
-                   <div className="w-12 h-12 rounded-full bg-blue-100 border-4 border-white shadow-sm flex items-center justify-center text-blue-400 font-black text-xs">M</div>
-                   <div className="w-12 h-12 rounded-full bg-pink-100 border-4 border-white shadow-sm flex items-center justify-center text-pink-400 font-black text-xs">F</div>
-                </div>
-                <button 
-                  onClick={() => window.open(selectedRecord.coupleImgUrl, '_blank')}
-                  className="px-8 py-4 bg-gradient-to-r from-pink-500 to-rose-400 text-white rounded-2xl font-black text-sm shadow-xl shadow-pink-100 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
-                >
-                  保存高清原图
-                </button>
-              </div>
-            </div>
+          {/* 图片上的标签 */}
+          <div className="absolute bottom-4 left-4 flex gap-2 md:bottom-8 md:left-8 md:gap-3">
+            <span className="bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-pink-600 text-[10px] md:text-xs font-black shadow-2xl flex items-center gap-1 md:gap-2 border border-pink-50">
+              <Palette size={12} className="md:size-4" /> {selectedRecord.style}
+            </span>
+            <span className="bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-rose-600 text-[10px] md:text-xs font-black shadow-2xl flex items-center gap-1 md:gap-2 border border-rose-50">
+              <MapPin size={12} className="md:size-4" /> {selectedRecord.scene}
+            </span>
           </div>
         </div>
-      )}
+
+        {/* 右侧：完整祝福语与信息 */}
+        <div className="w-full md:w-2/5 p-6 md:p-12 flex flex-col justify-center space-y-6 md:space-y-10 bg-gradient-to-br from-white via-white to-pink-50/50 relative overflow-y-auto custom-scrollbar">
+          <div className="space-y-2 md:space-y-4">
+            <div className="flex items-center gap-2 text-pink-400 font-black tracking-widest uppercase text-[10px]">
+              <Sparkles size={12} /> 浪漫记录 · {new Date(selectedRecord.createdAt).toLocaleDateString()}
+            </div>
+            <h3 className="text-3xl md:text-4xl font-black text-gray-800 leading-tight tracking-tighter">
+              时光寄语
+            </h3>
+          </div>
+
+          <div className="relative">
+            <MessageSquareHeart className="absolute -top-8 -left-8 text-pink-50/50 hidden md:block" size={100} />
+            <p className="relative text-lg md:text-2xl text-gray-700 font-serif italic leading-relaxed whitespace-pre-wrap drop-shadow-sm">
+              {selectedRecord.blessing}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
     </div>
   );
 }

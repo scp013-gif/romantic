@@ -113,10 +113,10 @@ export default function Home() {
   return (
     <div className="max-w-7xl mx-auto p-6 lg:p-12 space-y-12">
       <header className="text-center space-y-4">
-        <h1 className="text-5xl font-black bg-gradient-to-r from-pink-600 to-rose-400 bg-clip-text text-transparent flex justify-center items-center gap-4">
-          <Heart className="fill-pink-500 text-pink-500" size={48} /> 浪漫 AI 实验室
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-pink-600 to-rose-400 bg-clip-text text-transparent flex justify-center items-center gap-2 sm:gap-4 whitespace-nowrap">
+          <Heart className="fill-pink-500 text-pink-500" size={32} /> 浪漫 AI 实验室
         </h1>
-        <p className="text-gray-400 font-bold tracking-[0.2em] uppercase text-sm">定制属于你们的浪漫瞬间</p>
+        <p className="text-gray-400 font-bold tracking-[0.2em] sm:tracking-[0.2em] md:tracking-[0.3em] uppercase text-sm">定制属于你们的浪漫瞬间</p>
       </header>
 
       <div className="grid lg:grid-cols-3 gap-10 items-start">
