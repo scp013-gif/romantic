@@ -15,3 +15,4 @@ export const getRecords = async () => {
 export const deleteRecords = async (id:number) => {
     return client.delete(`/generation/${id}`);
 }
+

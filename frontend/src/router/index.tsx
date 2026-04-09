@@ -10,14 +10,14 @@ const Home = lazy(() => import("@/pages/Home"));
 const Mine = lazy(() => import("@/pages/Mine"));
 
 export default function RouterConfig() {
-    const token = useAuthStore(s => s.accessToken);
+    const token = useAuthStore(state => state.accessToken);
     return (
         <Router>
             <Suspense fallback={<Loading/>}>
                 <Routes>
                     <Route path="/login" element={!token ? <Login/> : <Navigate to="/" />}/>
                     <Route path="/register"  element={<Register/>}/>
-                    <Route path="/" element={token ? <MainLayout/> : <Navigate to="/login" />}>
+                    <Route path="/" element={<MainLayout/>}>
                         <Route index element={<Home/>}/>
                         <Route path="mine" element={<Mine/>}/>
                     </Route>
