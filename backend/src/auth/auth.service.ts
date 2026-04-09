@@ -55,6 +55,9 @@ export class AuthService {
       const payload = this.jwtService.verify(refreshToken,{
         secret:process.env.JWT_REFRESH_SECRET,
       })
+      if(!payload.sub){
+        throw new BadRequestException('刷新token失败,请重新登录');
+      }
       const newAccessToken = this.jwtService.sign(
         {sub:payload.sub},
         {
