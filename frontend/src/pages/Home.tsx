@@ -1,8 +1,9 @@
 import { useState, type ChangeEvent } from 'react';
 import { Heart, Sparkles, User, UserPlus, RefreshCw, Palette, MapPin, CheckCircle2 } from 'lucide-react';
 import client from '@/api/config' // 使用自定义 Axios 实例
+import { uploadTask } from '@/lib/uploadTask';
 import PhotoUploader from '@/components/PhotoUploader';
-
+import { useStreamProcessing } from '@/hooks/useStreamProcessing';
 // 预定义选项
 const STYLES = ['唯美浪漫', '日系动漫', '复古港风', '赛博朋克', '中式婚服'];
 const SCENES = ['海边落日', '繁花草坪', '星空教堂', '校园操场', '江南古镇'];
@@ -17,6 +18,8 @@ export default function Home() {
   const [coupleImg, setCoupleImg] = useState('');
   const [status, setStatus] = useState<'idle' | 'uploading' | 'generating' | 'success'>('idle');
   const isLocked = status === 'uploading' || status === 'generating';
+
+  const { isStreaming, currentContent, currentImageUrl, processStream } = useStreamProcessing();
 
   // 处理文件选择与本地预览
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'male' | 'female') => {
@@ -35,15 +38,7 @@ export default function Home() {
 
     try {
       // 上传图片到后端 (自动触发 Axios 拦截器注入 Token/无感刷新)
-      const uploadTask = async (file: File) => {
-        const fd = new FormData();
-        fd.append('file', file);
-        const { data } = await client.post('/upload', fd, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        return data.url;
-      };
-
+      
       const [maleUrl, femaleUrl] = await Promise.all([
         uploadTask(files.male),
         uploadTask(files.female)
@@ -51,57 +46,20 @@ export default function Home() {
 
       // 发起流式请求
       setStatus('generating');
-      let fullBlessing = '';
-      let finalImageUrl = '';
-      let currentBlessing = '';
-      let currentCoupleImg = '';
-
-      await client.post('/generation/upload', 
-        { maleImg: maleUrl, femaleImg: femaleUrl, style, scene },
-        {
-          // 利用 Axios 的下载进度回调
-          onDownloadProgress: (progressEvent) => {
-            const chunk = progressEvent.event.target.responseText;
-            const lines = chunk.split('\n');
-            
-            for (const line of lines) {
-              if (line.startsWith('data: ')) {
-                const rawData = line.slice(6).trim();
-                console.log(rawData);
-                if (rawData === '[DONE]') return; // 流结束
-
-                try {
-                  const { content, imageUrl } = JSON.parse(rawData);
-                  // 匹配后端逻辑：如果是图片 URL，更新大图
-                  if (imageUrl && imageUrl !== currentCoupleImg) {
-                    currentCoupleImg = imageUrl;
-                    setCoupleImg(imageUrl);
-                  }
-                  // 如果是文本片段，更新打字机效果
-                  if (content && !content.trim().startsWith('http')) {
-                    currentBlessing += content;
-                  }
-                } catch (e) {
-                    throw e;
-                }
-              }
-            }
-            if(currentBlessing) setBlessing(currentBlessing);
-            if(currentCoupleImg) setCoupleImg(currentCoupleImg);
-
-            fullBlessing = currentBlessing;
-            finalImageUrl = currentCoupleImg;
-          }
-        }
-      );
+      const { blessing:fullBlessing,imageUrl:finalImage } = await processStream('/generation/upload',
+        {maleImg: maleUrl, femaleImg: femaleUrl, style, scene}
+      ) 
+      
 
       // 自动保存记录 
       await client.post('/generation/save', {
         input: { maleImg: maleUrl, femaleImg: femaleUrl, style, scene },
-        result: { coupleImgUrl: finalImageUrl, blessing: fullBlessing }
+        result: { coupleImgUrl: finalImage, blessing: fullBlessing }
       });
       
       setStatus('success');
+      setCoupleImg(finalImage);
+      setBlessing(fullBlessing);
 
     } catch (err) {
       console.error('浪漫实验失败:', err);
