@@ -34,8 +34,8 @@ export class UploadController {
       throw new BadRequestException('未接收到文件');
     }
 
-    // 获取基础 URL，优先从环境变量读取
-    const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+    
+    const baseUrl = 'http://localhost:3000';
     
     // 返回给前端的完整访问 URL
     return {
