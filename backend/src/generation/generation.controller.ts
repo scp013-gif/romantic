@@ -19,31 +19,10 @@ export class GenerationController {
     (res as any).setHeader('Connection', 'keep-alive');
 
     try {
-      
-      const observable = await this.generationService.callCozeApi(userUploadDto);
-
-      
-      const subscription = observable.subscribe({
-        next: (event: any) => {
-          // 按照 SSE 格式写入：data: 内容\n\n
-          (res as any).write(`data: ${JSON.stringify(event.data)}\n\n`);
-        },
-        error: (err) => {
-          console.error('流处理出错:', err);
-          (res as any).end();
-        },
-        complete: () => {
-          // 发送结束标识并关闭连接
-          (res as any).write('data: "[DONE]"\n\n');
-          (res as any).end();
-        }
+      await this.generationService.callCozeApi(userUploadDto,(data) => {
+        (res as any).write(`data: ${data}\n\n`)
       });
-
-      //  当客户端主动断开连接时，取消订阅防止内存泄漏
-      (res as any).on('close', () => {
-        subscription.unsubscribe();
-      });
-
+      (res as any).end()
     } catch (err) {
       console.error('开启流失败:', err);
       (res as any).status(500).send('Internal Server Error');

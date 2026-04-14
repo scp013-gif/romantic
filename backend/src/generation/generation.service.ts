@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CozeAPI } from '@coze/api';
 import { UserUploadDto } from './dto/user.upload';
-import { filter, from, map, Observable } from 'rxjs';
 @Injectable()
 export class GenerationService {
     private apiClient: CozeAPI;
@@ -15,7 +14,7 @@ export class GenerationService {
         })
     }
 
-    async callCozeApi(UserUploadDto:UserUploadDto):Promise<Observable<MessageEvent>>{
+    async callCozeApi(UserUploadDto:UserUploadDto ,onChunk:(data:string) => void):Promise<void>{
         const {maleImg,femaleImg,style,scene} = UserUploadDto;
         try{
                 const stream = await this.apiClient.workflows.runs.stream({
@@ -28,29 +27,21 @@ export class GenerationService {
                 }
             })
 
-            return from(stream).pipe(
-                filter(part => part.event === 'Message' || part.event === 'Done'),
-                map(part => {
+            for await (const part of stream) {
+                if(part.event === 'Message' || part.event === 'Done') {
                     if(part.event === 'Done'){
-                        return {data:'[DONE]'} as MessageEvent;
+                        onChunk('[DONE]');
+                        break;
                     }
-                    // 仅当事件为 Message 时才尝试读取 content，否则返回空字符串
                     const data = part.data || {};
                     const content = (data as any).content || '';
-
                     let imageUrl = (data as any).image_url || (data as any).url || null;
                     if(!imageUrl && content.trim().startsWith('http')){
                         imageUrl = content;
                     }
-                    return {
-                        data:{
-                            content,
-                            imageUrl
-                        }
-                    } as MessageEvent;
+                    onChunk(JSON.stringify({content,imageUrl}));
                 }
-              )
-            )
+            }
         }catch(err){
             console.log(err);
             return err;
