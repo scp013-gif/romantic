@@ -59,7 +59,7 @@ export default function Home() {
       await client.post('/generation/upload', 
         { maleImg: maleUrl, femaleImg: femaleUrl, style, scene },
         {
-          // 关键：利用 Axios 的进度回调处理流
+          // 利用 Axios 的下载进度回调
           onDownloadProgress: (progressEvent) => {
             const chunk = progressEvent.event.target.responseText;
             const lines = chunk.split('\n');
@@ -158,36 +158,35 @@ export default function Home() {
 
         {/* 第三栏：结果实时展示 */}
         <section className="bg-white rounded-[3.5rem] p-8 shadow-2xl border-4 border-pink-50 min-h-[550px] flex flex-col items-center order-3 relative overflow-hidden">
-          {status === 'generating' && (
+          <div className="w-full h-80 rounded-[2.5rem] bg-pink-50/50 flex items-center justify-center mb-8 overflow-hidden border-4 border-dashed border-pink-100 shadow-inner relative">
+            {status === 'generating' && (
             <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] z-10 flex items-center justify-center">
               <div className="bg-pink-500 text-white px-8 py-3 rounded-full font-bold animate-pulse shadow-xl flex items-center gap-2">
                 <Sparkles size={18} /> AI 正在绘制浪漫...
               </div>
             </div>
           )}
-
-          <div className="w-full h-80 rounded-[2.5rem] bg-pink-50/50 flex items-center justify-center mb-8 overflow-hidden border-4 border-dashed border-pink-100 shadow-inner">
             {coupleImg ? (
               <img src={coupleImg} className="w-full h-full object-cover animate-in fade-in zoom-in duration-1000" alt="Generated" />
             ) : (
-              <Heart size={80} className="text-pink-100 animate-pulse" />
-            )}
+            <Heart size={80} className="text-pink-100 animate-pulse" />
+          )}
           </div>
 
-          <div className="w-full px-4 space-y-4">
-            <h3 className="text-pink-400 font-black italic flex items-center gap-2">
-              <Sparkles size={18} /> 浪漫寄语
-            </h3>
-            <p className="text-2xl text-gray-700 font-serif italic leading-relaxed whitespace-pre-wrap min-h-[150px] text-center">
-              {blessing || (status === 'generating' ? "正在构思最美的文字..." : "期待属于你们的专属故事")}
-            </p>
+        <div className="w-full px-4 space-y-4">
+          <h3 className="text-pink-400 font-black italic flex items-center gap-2">
+            <Sparkles size={18} /> 浪漫寄语
+          </h3>
+          <p className="text-2xl text-gray-700 font-serif italic leading-relaxed whitespace-pre-wrap min-h-[150px] text-center">
+            {blessing || (status === 'generating' ? "正在构思最美的文字..." : "期待属于你们的专属故事")}
+          </p>
+        </div>
+  
+        {status === 'success' && (
+          <div className="mt-4 flex items-center gap-2 text-green-500 font-bold animate-in slide-in-from-bottom-2">
+            <CheckCircle2 size={18} /> 记忆已存入“我的珍藏”
           </div>
-          
-          {status === 'success' && (
-            <div className="mt-4 flex items-center gap-2 text-green-500 font-bold animate-in slide-in-from-bottom-2">
-              <CheckCircle2 size={18} /> 记忆已存入“我的珍藏”
-            </div>
-          )}
+        )}
         </section>
       </div>
     </div>
