@@ -43,13 +43,13 @@ export const useAuthStore = create<AuthStore>()(
         },
         updateAccessToken:(token) => set({accessToken:token}),
         logout:() => {
+            localStorage.removeItem('romantic-auth-storage');
             set({
                 accessToken:null,
                 refreshToken:null,
                 isLogin:false,
                 user:null,
             });
-            localStorage.removeItem('romantic-auth-storage');
         },
     }),
     {

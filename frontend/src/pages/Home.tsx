@@ -124,8 +124,8 @@ export default function Home() {
               </div>
             </div>
           )}
-            {coupleImg ? (
-              <img src={coupleImg} className="w-full h-full object-cover animate-in fade-in zoom-in duration-1000" alt="Generated" />
+            {currentImageUrl ? (
+              <img src={currentImageUrl} className="w-full h-full object-cover animate-in fade-in zoom-in duration-1000" alt="Generated" />
             ) : (
             <Heart size={80} className="text-pink-100 animate-pulse" />
           )}
@@ -136,7 +136,7 @@ export default function Home() {
             <Sparkles size={18} /> 浪漫寄语
           </h3>
           <p className="text-2xl text-gray-700 font-serif italic leading-relaxed whitespace-pre-wrap min-h-[150px] text-center">
-            {blessing || (status === 'generating' ? "正在构思最美的文字..." : "期待属于你们的专属故事")}
+            {currentContent || (status === 'generating' ? "正在构思最美的文字..." : "期待属于你们的专属故事")}
           </p>
         </div>
   

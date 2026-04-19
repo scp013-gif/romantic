@@ -1,6 +1,7 @@
 import { Upload } from 'lucide-react';
+import { memo } from 'react';
 
-export default function PhotoUploader({ label, preview, onChange, icon, disabled }: any) {
+const PhotoUploader = memo(({ label, preview, onChange, icon, disabled }: any) => {
   return (
     <div className={`space-y-3 ${disabled ? 'opacity-50' : 'opacity-100'}`}>
       <p className="text-center font-black text-gray-500 flex items-center justify-center gap-2 uppercase tracking-tighter text-xs">{icon} {label}</p>
@@ -19,4 +20,6 @@ export default function PhotoUploader({ label, preview, onChange, icon, disabled
       </label>
     </div>
   );
-}
+});
+
+export default PhotoUploader;

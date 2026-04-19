@@ -1,8 +1,9 @@
 import { Link, Outlet } from 'react-router-dom'
 import { Heart, User, LogOut } from 'lucide-react'
 import { useAuthStore } from '@/store/useAuthStore'
+import { memo } from 'react';
 
-export default function MainLayout() {
+const MainLayout = memo(() => {
     return(
     <div className="min-h-screen bg-rose-50/30">
         <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-50 p-4 shadow-sm flex justify-center gap-12 font-bold text-gray-600">
@@ -13,4 +14,5 @@ export default function MainLayout() {
     <Outlet />
   </div>
     )
-}
+});
+export default MainLayout;
